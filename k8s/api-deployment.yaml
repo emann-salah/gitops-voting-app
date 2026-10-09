@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: api-deployment
+  labels:
+    app: api
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: api
+
+  template:
+    metadata:
+      labels:
+        app: api
+
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/emann-salah/garden-api:173e76039b7c74258d11b51f991bd4e0ff71db0e
+
+          command:
+            - gunicorn
+          args:
+            - app:app
+            - -b
+            - 0.0.0.0:80
+            - --workers
+            - "4"
+
+          ports:
+            - containerPort: 80
+
+          env:
+            - name: PGHOST
+              value: postgres
+
+            - name: PGDATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_DB
+
+            - name: PGUSER
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_USER
+
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+
+
