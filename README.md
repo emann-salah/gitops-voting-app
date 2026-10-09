@@ -1,10 +1,8 @@
 # GitOps Voting App
 
-A three-tier voting app (Vue, Flask, PostgreSQL) with a complete delivery pipeline: **GitHub Actions** builds and publishes container images, and **ArgoCD** keeps a Kubernetes cluster in sync with Git.
+A three-tier voting app (Vue, Flask, PostgreSQL) deployed to Kubernetes. GitHub Actions builds and publishes the container images, and ArgoCD syncs the cluster from Git.
 
-A push to `main` is all it takes. Images are built, tagged with the commit SHA, the manifests are updated automatically, and ArgoCD rolls the change out. There is no manual `kubectl apply`.
-
-## How it works
+## Architecture
 
 ```mermaid
 flowchart LR
@@ -17,11 +15,9 @@ flowchart LR
     K8s -->|pulls images| GHCR
 ```
 
-1. **CI** validates the config, builds the `api` and `web` images, and pushes them to GHCR.
+1. The CI pipeline validates the config, builds the `api` and `web` images, and pushes them to GHCR.
 2. A final CI job writes the new image tag into `k8s/` and commits it back to `main`.
-3. **ArgoCD** detects the change in Git and applies it to the cluster with a rolling update.
-
-Git is the single source of truth. Delivery is pull-based, so the CI never needs access to the cluster.
+3. ArgoCD detects the change in Git and applies it to the cluster with a rolling update.
 
 ## CI pipeline
 
@@ -30,10 +26,8 @@ Git is the single source of truth. Delivery is pull-based, so the CI never needs
 | Job | Purpose |
 |---|---|
 | `validate` | Validates `docker-compose.yml` and the YAML in `k8s/` |
-| `build-push` | Builds `api` and `web` with a matrix build. Pushes to GHCR only on `main`, tagged with `github.sha` |
+| `build-push` | Builds `api` and `web` and pushes them to GHCR on `main`, tagged with the commit SHA |
 | `update-manifests` | Updates the image tags in `k8s/*-deployment.yaml` and commits them back |
-
-Highlights: matrix build, least-privilege `permissions` per job, unique SHA tags instead of `latest`, and no pipeline loop because commits pushed with `GITHUB_TOKEN` do not trigger workflows.
 
 ## GitOps with ArgoCD
 
@@ -79,4 +73,3 @@ To run it without Kubernetes: `docker compose up --build`.
 ## Credits
 
 Sample app from [garden-io/web-app-example](https://github.com/garden-io/web-app-example).
-
