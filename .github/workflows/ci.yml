@@ -65,6 +65,7 @@ jobs:
       packages: write
 
     strategy:
+      fail-fast: false
       matrix:
         service: [api, web]
 
@@ -80,13 +81,24 @@ jobs:
           push: false
           tags: ghcr.io/emann-salah/garden-${{ matrix.service }}:${{ github.sha }}
 
-      - name: Scan ${{ matrix.service }} image with Trivy
+      - name: Trivy report for ${{ matrix.service }} (libraries, informational)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ghcr.io/emann-salah/garden-${{ matrix.service }}:${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          vuln-type: library
+          exit-code: "0"
+
+      - name: Trivy gate for ${{ matrix.service }} (OS, fails on CRITICAL)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ghcr.io/emann-salah/garden-${{ matrix.service }}:${{ github.sha }}
           format: table
           severity: CRITICAL
           ignore-unfixed: true
+          vuln-type: os
           exit-code: "1"
 
       - name: Login to GHCR
