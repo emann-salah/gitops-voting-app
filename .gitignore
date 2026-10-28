@@ -68,3 +68,4 @@ typings/
 # IDEs
 .vscode
 .history
+__pycache__/
