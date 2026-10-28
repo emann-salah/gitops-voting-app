@@ -85,9 +85,9 @@ jobs:
         with:
           image-ref: ghcr.io/emann-salah/garden-${{ matrix.service }}:${{ github.sha }}
           format: table
-          severity: HIGH,CRITICAL
+          severity: CRITICAL
           ignore-unfixed: true
-          exit-code: "0"
+          exit-code: "1"
 
       - name: Login to GHCR
         if: github.event_name == 'push'
