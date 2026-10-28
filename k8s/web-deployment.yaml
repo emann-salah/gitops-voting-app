@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: ghcr.io/emann-salah/garden-web:44f46c48a3b490c836f665913feddb3991fb0923
+          image: ghcr.io/emann-salah/garden-web:f2fbc0efa935f26782913b70ddd9e4d4db3128be
 
           ports:
             - containerPort: 8080
