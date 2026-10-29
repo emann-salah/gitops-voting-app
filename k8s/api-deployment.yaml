@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: ghcr.io/emann-salah/garden-api:ec694348f1e327e951644abba8cb8f6efde35e31
+          image: ghcr.io/emann-salah/garden-api:25fc2c1967dcdbad4d2687bf2cae2b9d1e2bb7f9
 
           command:
             - gunicorn
